@@ -221,7 +221,7 @@ elif st.session_state.step == "buses":
         st.markdown("---")
 
 # ==========================================
-# STEP 3: VISUAL SEAT NUMBER SELECTION
+# STEP 3: VISUAL 42-BERTH SEAT NUMBER SELECTION (7 ROWS x 6 BERTHS)
 # ==========================================
 elif st.session_state.step == "seats":
     coach = st.session_state.selected_coach
@@ -231,69 +231,116 @@ elif st.session_state.step == "seats":
         st.session_state.step = "buses"
         st.rerun()
 
-    st.subheader(f"Select Seats: {coach['name']}")
-    st.write(f"Fare: **₹{coach['fare']:,}** per berth/seat")
+    st.subheader(f"Select Berths: {coach['name']}")
+    st.caption("Standard 42-Berth Layout • 7 Rows • Lower & Upper Decks")
 
-    # Display seat arrangement layout
-    st.markdown("### 🚌 Coach Layout (Steering on Left 🧭)")
-    
-    # Pre-defined booked seats
-    occupied_seats = ["L2", "L5", "L9", "U3", "U7", "U11"]
+    # Generate all 42 berth identifiers
+    # Double berths: L{row}A, L{row}B (Lower), U{row}A, U{row}B (Upper)
+    # Side berths:   SL{row} (Lower), SU{row} (Upper)
+    all_42_berths = []
+    for row in range(1, 8):
+        # Double side
+        all_42_berths.extend([f"L{row}A", f"L{row}B", f"U{row}A", f"U{row}B"])
+        # Side/Single berths
+        all_42_berths.extend([f"SL{row}", f"SU{row}"])
 
-    # Lower Deck Layout
-    st.markdown("**Lower Deck (Berths L1 to L12)**")
-    l_cols = st.columns(6)
-    for i in range(1, 7):
-        seat_id = f"L{i}"
-        if seat_id in occupied_seats:
-            l_cols[i-1].markdown(f"<div class='seat-box seat-booked'>{seat_id}<br>❌</div>", unsafe_allow_html=True)
-        else:
-            l_cols[i-1].markdown(f"<div class='seat-box seat-avail'>{seat_id}<br>₹{coach['fare']}</div>", unsafe_allow_html=True)
+    # Sample occupied berths
+    occupied_seats = ["L1A", "U2B", "SL3", "U4A", "L6B", "SU7"]
 
-    # Upper Deck Layout
-    st.markdown("**Upper Deck (Berths U1 to U12)**")
-    u_cols = st.columns(6)
-    for i in range(1, 7):
-        seat_id = f"U{i}"
-        if seat_id in occupied_seats:
-            u_cols[i-1].markdown(f"<div class='seat-box seat-booked'>{seat_id}<br>❌</div>", unsafe_allow_html=True)
-        else:
-            u_cols[i-1].markdown(f"<div class='seat-box seat-avail'>{seat_id}<br>₹{coach['fare']}</div>", unsafe_allow_html=True)
+    st.markdown("### 🚌 Bus Deck Layout")
+
+    # --- LOWER DECK (3 Berths per row x 7 rows = 21 Lower Berths) ---
+    with st.expander("🔻 LOWER DECK (21 Berths)", expanded=True):
+        st.write("**Double Side (Left) &emsp;&emsp;&emsp;&emsp; Aisle &emsp;&emsp;&emsp;&emsp; Single Side (Right)**")
+        for row in range(1, 8):
+            c1, c2, c_aisle, c3 = st.columns([1, 1, 0.4, 1])
+            
+            # Double Berth 1
+            s1 = f"L{row}A"
+            if s1 in occupied_seats:
+                c1.markdown(f"<div class='seat-box seat-booked'>{s1}<br>Booked</div>", unsafe_allow_html=True)
+            else:
+                c1.markdown(f"<div class='seat-box seat-avail'>{s1}<br>₹{coach['fare']}</div>", unsafe_allow_html=True)
+            
+            # Double Berth 2
+            s2 = f"L{row}B"
+            if s2 in occupied_seats:
+                c2.markdown(f"<div class='seat-box seat-booked'>{s2}<br>Booked</div>", unsafe_allow_html=True)
+            else:
+                c2.markdown(f"<div class='seat-box seat-avail'>{s2}<br>₹{coach['fare']}</div>", unsafe_allow_html=True)
+            
+            c_aisle.markdown("<div style='text-align:center; color:#bbb;'>|</div>", unsafe_allow_html=True)
+            
+            # Single Side Berth
+            s_side = f"SL{row}"
+            if s_side in occupied_seats:
+                c3.markdown(f"<div class='seat-box seat-booked'>{s_side}<br>Booked</div>", unsafe_allow_html=True)
+            else:
+                c3.markdown(f"<div class='seat-box seat-avail'>{s_side}<br>₹{coach['fare']}</div>", unsafe_allow_html=True)
+
+    # --- UPPER DECK (3 Berths per row x 7 rows = 21 Upper Berths) ---
+    with st.expander("🔺 UPPER DECK (21 Berths)", expanded=True):
+        st.write("**Double Side (Left) &emsp;&emsp;&emsp;&emsp; Aisle &emsp;&emsp;&emsp;&emsp; Single Side (Right)**")
+        for row in range(1, 8):
+            u1, u2, u_aisle, u3 = st.columns([1, 1, 0.4, 1])
+            
+            # Double Berth 1 Upper
+            s1 = f"U{row}A"
+            if s1 in occupied_seats:
+                u1.markdown(f"<div class='seat-box seat-booked'>{s1}<br>Booked</div>", unsafe_allow_html=True)
+            else:
+                u1.markdown(f"<div class='seat-box seat-avail'>{s1}<br>₹{coach['fare']}</div>", unsafe_allow_html=True)
+            
+            # Double Berth 2 Upper
+            s2 = f"U{row}B"
+            if s2 in occupied_seats:
+                u2.markdown(f"<div class='seat-box seat-booked'>{s2}<br>Booked</div>", unsafe_allow_html=True)
+            else:
+                u2.markdown(f"<div class='seat-box seat-avail'>{s2}<br>₹{coach['fare']}</div>", unsafe_allow_html=True)
+            
+            u_aisle.markdown("<div style='text-align:center; color:#bbb;'>|</div>", unsafe_allow_html=True)
+            
+            # Single Side Berth Upper
+            s_side = f"SU{row}"
+            if s_side in occupied_seats:
+                u3.markdown(f"<div class='seat-box seat-booked'>{s_side}<br>Booked</div>", unsafe_allow_html=True)
+            else:
+                u3.markdown(f"<div class='seat-box seat-avail'>{s_side}<br>₹{coach['fare']}</div>", unsafe_allow_html=True)
 
     st.markdown("---")
-    
-    # Interactive Seat Picker
-    available_choices = [f"L{i}" for i in range(1, 13) if f"L{i}" not in occupied_seats] + \
-                        [f"U{i}" for i in range(1, 13) if f"U{i}" not in occupied_seats]
-    
-    selected_seats = st.multiselect(
-        "Choose your Seat Numbers:",
-        options=available_choices,
-        default=[available_choices[0]]
+
+    # Available seats to select
+    selectable_berths = [b for b in all_42_berths if b not in occupied_seats]
+
+    chosen_berths = st.multiselect(
+        "Choose Your Berth(s):",
+        options=selectable_berths,
+        default=[selectable_berths[0]]
     )
 
-    if selected_seats:
-        total_fare = len(selected_seats) * coach['fare']
-        st.success(f"Selected Seats: **{', '.join(selected_seats)}** | Total Price: **₹{total_fare:,}**")
+    if chosen_berths:
+        total_price = len(chosen_berths) * coach['fare']
+        st.success(f"Selected: **{', '.join(chosen_berths)}** ({len(chosen_berths)} Berths) | Total: **₹{total_price:,}**")
 
         passenger_names = st.text_input("Passenger Name(s)", value=st.session_state.user_name)
 
         if st.button("Confirm & Pay Ticket", type="primary", use_container_width=True):
-            pnr_code = f"YKT-{datetime.now().strftime('%d%H%M%S')}"
+            pnr = f"YKT-{datetime.now().strftime('%d%H%M%S')}"
             booking = {
-                "pnr": pnr_code,
+                "pnr": pnr,
                 "coach": coach['name'],
                 "from": r['from'],
                 "to": r['to'],
                 "date": r['date'],
-                "seats": selected_seats,
+                "seats": chosen_berths,
                 "passengers": passenger_names,
-                "fare": total_fare
+                "fare": total_price
             }
             st.session_state.bookings.append(booking)
             st.session_state.last_ticket = booking
             st.session_state.step = "receipt"
             st.rerun()
+
 
 # ==========================================
 # STEP 4: CONFIRMED E-TICKET RECEIPT
