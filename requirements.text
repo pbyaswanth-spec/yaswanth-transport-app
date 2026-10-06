@@ -1,6 +1,4 @@
-cat << 'EOF' > requirements.txt
 streamlit
 qrcode
 pillow
-EOF
-pip install -r requirements.txt
+
