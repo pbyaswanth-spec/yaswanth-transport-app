@@ -1,2 +1,6 @@
+cat << 'EOF' > requirements.txt
 streamlit
-pandas
+qrcode
+pillow
+EOF
+pip install -r requirements.txt
